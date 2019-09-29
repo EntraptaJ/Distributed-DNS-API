@@ -7,9 +7,13 @@ import {
   Column,
   ManyToOne,
   UpdateDateColumn,
+  AfterUpdate,
+  AfterInsert,
+  AfterRemove,
 } from 'typeorm';
 import { ResourceRecordType } from './ResourceRecordTypes';
 import { Zone } from '../Zones/ZoneModel';
+import { subscriberPubSub } from '../Subscribers/SubscriptionPubSub';
 
 @ObjectType()
 @Entity()
@@ -37,4 +41,14 @@ export class ResourceRecord extends BaseEntity {
   zone: Zone;
   @Column()
   zoneId: string;
+
+  @AfterUpdate()
+  @AfterInsert()
+  @AfterRemove()
+  async updateZone(): Promise<void> {
+    subscriberPubSub.publish(
+      this.zoneId,
+      await Zone.findOneOrFail(this.zoneId),
+    );
+  }
 }

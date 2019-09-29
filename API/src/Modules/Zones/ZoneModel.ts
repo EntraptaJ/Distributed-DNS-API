@@ -10,11 +10,13 @@ import {
   CreateDateColumn,
   FindOneOptions,
   ManyToMany,
+  AfterUpdate,
 } from 'typeorm';
 import { ResourceRecord } from '../ResourceRecords/ResourceRecordModel';
 import { ZonePermissions, ZoneAccessPermission } from './ZonePermissionModel';
 import { User } from '../Users/UserModel';
 import { Subscriber } from '../Subscribers/SubscriberModel';
+import { subscriberPubSub } from '../Subscribers/SubscriptionPubSub';
 
 @ObjectType()
 @Entity()
@@ -93,5 +95,10 @@ export class Zone extends BaseEntity {
   ): Promise<Zone> {
     const zone = await Zone.findOneOrFail(zoneId, options);
     return zone.checkUserAuthorization(user, requiredPermission);
+  }
+
+  @AfterUpdate()
+  updateZone(): void {
+    subscriberPubSub.publish(this.id, this);
   }
 }

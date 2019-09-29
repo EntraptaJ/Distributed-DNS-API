@@ -5,7 +5,6 @@ import { ResourceRecord } from './ResourceRecordModel';
 import { Zone } from '../Zones/ZoneModel';
 import { AuthContext } from 'API/Context';
 import { ZoneAccessPermission } from '../Zones/ZonePermissionModel';
-import { subscriberPubSub } from '../Subscribers/SubscriptionPubSub';
 
 @Resolver(() => ResourceRecord)
 export class ResourceRecordResolver {
@@ -26,8 +25,6 @@ export class ResourceRecordResolver {
       data: JSON.stringify({ value }),
       ...type,
     }).save();
-
-    subscriberPubSub.publish(zone.id, zone);
 
     return true;
   }

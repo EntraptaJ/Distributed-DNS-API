@@ -6,6 +6,8 @@ export type Scalars = {
   Boolean: boolean,
   Int: number,
   Float: number,
+  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
+  DateTime: any,
 };
 
 export type AuthResponse = {
@@ -19,12 +21,16 @@ export type Configuration = {
   id: Scalars['ID'],
 };
 
+export type CreateSubscriberInput = {
+  zoneIds: Array<Scalars['String']>,
+};
+
 export type CreateUtilityInput = {
   name: Scalars['String'],
 };
 
 export type CreateValueResourceRecordInput = {
-  domainName: Scalars['String'],
+  zoneId: Scalars['String'],
   type: ResourceRecordType,
   host: Scalars['String'],
   value: Scalars['String'],
@@ -37,6 +43,7 @@ export type CurrentUser = {
   email: Scalars['String'],
   roles: Array<UserRole>,
 };
+
 
 export type InitialConfigurationInput = {
   initialUser: UserInput,
@@ -54,6 +61,7 @@ export type Mutation = {
   resetPasswordReset: Scalars['Boolean'],
   initialConfiguration: Configuration,
   createValueResourceRecord: Scalars['Boolean'],
+  createSubscriber: Subscriber,
   createUtility: Utility,
   createZone: Zone,
 };
@@ -84,6 +92,11 @@ export type MutationCreateValueResourceRecordArgs = {
 };
 
 
+export type MutationCreateSubscriberArgs = {
+  input: CreateSubscriberInput
+};
+
+
 export type MutationCreateUtilityArgs = {
   input: CreateUtilityInput
 };
@@ -97,10 +110,22 @@ export type Query = {
    __typename?: 'Query',
   currentUser: User,
   hasSetup: Scalars['Boolean'],
+  getSubscribedZones: Array<Zone>,
   users: Array<User>,
   utilities: Array<Utility>,
   helloWorld: Scalars['String'],
   zones: Array<Zone>,
+  zone: Zone,
+};
+
+
+export type QueryGetSubscribedZonesArgs = {
+  subscriberToken: Scalars['String']
+};
+
+
+export type QueryZoneArgs = {
+  zoneId: Scalars['String']
 };
 
 export type RegisterInput = {
@@ -139,6 +164,23 @@ export enum ResourceRecordType {
   Ns = 'NS'
 }
 
+export type Subscriber = {
+   __typename?: 'Subscriber',
+  id: Scalars['ID'],
+  subscribedZones: Array<Zone>,
+  subscriberToken: Scalars['String'],
+};
+
+export type Subscription = {
+   __typename?: 'Subscription',
+  subscribeToZones: Zone,
+};
+
+
+export type SubscriptionSubscribeToZonesArgs = {
+  subscriberToken: Scalars['String']
+};
+
 export type User = {
    __typename?: 'User',
   id: Scalars['ID'],
@@ -166,24 +208,64 @@ export type Utility = {
 export type Zone = {
    __typename?: 'Zone',
   id: Scalars['ID'],
+  updatedDate: Scalars['DateTime'],
   domainName: Scalars['String'],
   resourceRecords: Array<ResourceRecord>,
+  accessPermissions: Array<ZonePermissions>,
+  subscribers: Array<Subscriber>,
 };
+
+export enum ZoneAccessPermissions {
+  Read = 'READ',
+  Write = 'WRITE',
+  Admin = 'ADMIN'
+}
 
 export type ZoneInput = {
   domainName: Scalars['String'],
+  /** The user requesting the zone */
+  zoneOwnerUserId: Scalars['String'],
 };
-export type ZonesQueryVariables = {};
+
+export type ZonePermissions = {
+   __typename?: 'ZonePermissions',
+  id: Scalars['ID'],
+  user: User,
+  accessPermissions: Array<ZoneAccessPermissions>,
+};
+export type ResourceRecordFragment = (
+  { __typename?: 'ResourceRecord' }
+  & Pick<ResourceRecord, 'id' | 'type' | 'host' | 'data'>
+);
+
+export type GetSubscribedZonesQueryVariables = {
+  subscriberToken: Scalars['String']
+};
 
 
-export type ZonesQuery = (
+export type GetSubscribedZonesQuery = (
   { __typename?: 'Query' }
-  & { zones: Array<(
-    { __typename?: 'Zone' }
-    & Pick<Zone, 'domainName' | 'id'>
-    & { resourceRecords: Array<(
-      { __typename?: 'ResourceRecord' }
-      & Pick<ResourceRecord, 'id' | 'type' | 'host' | 'data'>
-    )> }
-  )> }
+  & { getSubscribedZones: Array<{ __typename?: 'Zone' }
+    & ZoneFragment
+  > }
+);
+
+export type SubscribeToZonesSubscriptionVariables = {
+  subscriberToken: Scalars['String']
+};
+
+
+export type SubscribeToZonesSubscription = (
+  { __typename?: 'Subscription' }
+  & { subscribeToZones: { __typename?: 'Zone' }
+    & ZoneFragment
+   }
+);
+
+export type ZoneFragment = (
+  { __typename?: 'Zone' }
+  & Pick<Zone, 'domainName' | 'id' | 'updatedDate'>
+  & { resourceRecords: Array<{ __typename?: 'ResourceRecord' }
+    & ResourceRecordFragment
+  > }
 );
