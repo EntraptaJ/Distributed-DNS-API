@@ -1,0 +1,17 @@
+
+$ORIGIN kristianjones.dev.
+
+@ IN SOA ns1.kristianjones.dev. me@kristianjones.xyz (
+  1                   ; serial number
+  2500                       ; refresh period
+  2500                        ; retry period
+  2500                     ; expire time
+  300                     ) ; minimum ttl
+
+
+
+; NS Records 
+@	IN	NS	ns1.kristianjones.dev
+
+; A Records 
+@	IN	A	1.1.1.1
