@@ -26,5 +26,27 @@ services:
     environment:
       POSTGRES_PASSWORD: pgpass
       POSTGRES_DB: application
+  NS1:
+    image: resystit/bind9:latest
+    restart: unless-stopped
+    container_name: 'NS'
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+    volumes:
+      - 'zoneFiles:/Zones'
+      - 'bindConfig:/etc/bind/'
+  DNSDL:
+    build: './DNSDL'
+    image: 'dnsdl'
+    environment:
+      SUBSCRIBER_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWJzY3JpYmVySWQiOiJkM2RmMmY2ZC02Y2QyLTQ3YTMtODQxNy1iZmU3Yzg2ZDVhMzYiLCJpYXQiOjE1Njk3OTk5MjJ9.69XMBdWs2AKD4sEHPqQDcQxZEE3ZPlN1kskNPU5NCWI
+      API_URL: 'http://api/graphql'
+    volumes:
+      - 'zoneFiles:/data/Zones'
+      - 'bindConfig:/data/BIND'
+      - /var/run/docker.sock:/var/run/docker.sock
 volumes:
   databaseData:
+  zoneFiles:
+  bindConfig:

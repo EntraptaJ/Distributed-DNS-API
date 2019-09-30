@@ -208,6 +208,7 @@ export type Utility = {
 export type Zone = {
    __typename?: 'Zone',
   id: Scalars['ID'],
+  contact: Scalars['String'],
   updatedDate: Scalars['DateTime'],
   domainName: Scalars['String'],
   resourceRecords: Array<ResourceRecord>,
@@ -225,6 +226,8 @@ export type ZoneInput = {
   domainName: Scalars['String'],
   /** The user requesting the zone */
   zoneOwnerUserId: Scalars['String'],
+  ns: Scalars['String'],
+  contact: Scalars['String'],
 };
 
 export type ZonePermissions = {
@@ -264,7 +267,7 @@ export type SubscribeToZonesSubscription = (
 
 export type ZoneFragment = (
   { __typename?: 'Zone' }
-  & Pick<Zone, 'domainName' | 'id' | 'updatedDate'>
+  & Pick<Zone, 'domainName' | 'id' | 'updatedDate' | 'contact'>
   & { resourceRecords: Array<{ __typename?: 'ResourceRecord' }
     & ResourceRecordFragment
   > }

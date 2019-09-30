@@ -1,12 +1,14 @@
 // DNSDL/src/Zone/index.ts
-import { ZONE } from 'ts-zone-file';
+import { ZONE, generateZoneFile } from 'ts-zone-file';
 import { ZoneFragment } from './Zone.gen';
 import { handleResourceRecords } from '../ResourceRecords/index';
+import { outputFile } from 'fs-extra';
+import { DATA_VOLUME } from '..';
 
-export async function handleZone(zone: ZoneFragment): Promise<ZONE> {
+export async function handleZone(zone: ZoneFragment): Promise<void> {
   const zoneFile: ZONE = {
     soa: {
-      contact: 'me@kristianjones.xyz',
+      contact: zone.contact,
       serial: '1',
       refresh: '2500',
       retry: '2500',
@@ -19,5 +21,8 @@ export async function handleZone(zone: ZoneFragment): Promise<ZONE> {
 
   await handleResourceRecords(zone.resourceRecords, zoneFile);
 
-  return zoneFile;
+  return outputFile(
+    `${DATA_VOLUME}/Zones/${zone.domainName}`,
+    await generateZoneFile(zoneFile)
+  );
 }

@@ -2,19 +2,23 @@
 import { initApollo } from './initApollo';
 import { getSubscribedZones, subscribeToZone } from './Subscriber';
 import { handleZone } from './Zone';
-import { generateZoneFile } from 'ts-zone-file';
-import { outputFile } from 'fs-extra';
+import { restartContainer } from './Docker';
+import { createBINDConfig } from './BINDConfig';
 
-const DATA_VOLUME =
+export const DATA_VOLUME =
   process.env.NODE_ENV === 'production'
     ? process.env.DATA_VOLUME || '/data'
     : 'data';
 
 const subscriberToken = process.env.SUBSCRIBER_TOKEN;
 
+const API_URL = process.env.API_URL || 'http://localhost/graphql';
+
+export const domains = new Set<string>();
+
 async function startDNSDL(): Promise<void> {
   console.log('Starting DNSDL');
-  const client = initApollo({ URL: 'http://localhost/graphql' });
+  const client = initApollo({ URL: API_URL });
 
   console.log('Fetching subscribed Zones');
   const {
@@ -22,26 +26,25 @@ async function startDNSDL(): Promise<void> {
   } = await getSubscribedZones({ client, subscriberToken });
 
   for (const zone of zones) {
-    const Zone = await handleZone(zone);
-    await outputFile(
-      `${DATA_VOLUME}/${zone.domainName}`,
-      await generateZoneFile(Zone)
-    );
+    await handleZone(zone);
+    domains.add(zone.domainName);
   }
 
   console.log('Subscribing to changes');
 
   const subscription = await subscribeToZone({ client, subscriberToken });
   subscription.subscribe({
-    async next({ data: { subscribeToZones } }) {
-      console.log('Recieved new zone');
-      const Zone = await handleZone(subscribeToZones);
-      await outputFile(
-        `${DATA_VOLUME}/${Zone.$origin}`,
-        await generateZoneFile(Zone)
-      );
+    async next({ data: { subscribeToZones: zone } }) {
+      console.log('Received zone update');
+      await handleZone(zone);
+      domains.add(zone.domainName);
+      await createBINDConfig(domains);
+      await restartContainer();
     }
   });
+
+  await createBINDConfig(domains);
+  await restartContainer();
 }
 
 startDNSDL();

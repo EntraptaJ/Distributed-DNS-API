@@ -8,4 +8,10 @@ export class ZoneInput {
 
   @Field({ description: 'The user requesting the zone' })
   zoneOwnerUserId: string;
+
+  @Field()
+  ns: string;
+
+  @Field()
+  contact: string;
 }

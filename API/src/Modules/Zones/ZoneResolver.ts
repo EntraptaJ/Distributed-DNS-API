@@ -15,6 +15,7 @@ import { ZonePermissions, ZoneAccessPermission } from './ZonePermissionModel';
 import { AuthContext } from 'API/Context';
 import { ResourceRecord } from '../ResourceRecords/ResourceRecordModel';
 import { UserRole } from '../Users/UserRole';
+import { ResourceRecordType } from '../ResourceRecords/ResourceRecordTypes';
 
 @Resolver(() => Zone)
 export class ZoneResolver {
@@ -35,20 +36,29 @@ export class ZoneResolver {
 
   @Authorized([UserRole.ADMIN])
   @Mutation(() => Zone)
-  async createZone(
-    @Arg('input') input: ZoneInput,
-    @Ctx() { currentUser }: AuthContext,
-  ): Promise<Zone> {
-    const zone = await Zone.create(input).save();
+  async createZone(@Arg('input')
+  {
+    zoneOwnerUserId,
+    ns,
+    ...zoneInput
+  }: ZoneInput): Promise<Zone> {
+    const zone = await Zone.create(zoneInput).save();
 
     await ZonePermissions.create({
       zoneId: zone.id,
-      userId: currentUser.id,
+      userId: zoneOwnerUserId,
       accessPermissions: [
         ZoneAccessPermission.READ,
         ZoneAccessPermission.WRITE,
         ZoneAccessPermission.ADMIN,
       ],
+    }).save();
+
+    await ResourceRecord.create({
+      zoneId: zone.id,
+      type: ResourceRecordType.NS,
+      host: '@',
+      data: JSON.stringify({ value: ns }),
     }).save();
 
     return zone;

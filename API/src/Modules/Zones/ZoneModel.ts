@@ -28,6 +28,10 @@ export class Zone extends BaseEntity {
   @CreateDateColumn()
   readonly createdAt: Date;
 
+  @Field()
+  @Column('varchar')
+  contact: string;
+
   @Field(() => Date)
   async updatedDate(): Promise<Date> {
     const resourceRecord = await ResourceRecord.getRepository().findOne(

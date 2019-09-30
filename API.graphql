@@ -139,6 +139,7 @@ type Utility {
 
 type Zone {
   id: ID!
+  contact: String!
   updatedDate: DateTime!
   domainName: String!
   resourceRecords: [ResourceRecord!]!
@@ -157,6 +158,8 @@ input ZoneInput {
 
   """The user requesting the zone"""
   zoneOwnerUserId: String!
+  ns: String!
+  contact: String!
 }
 
 type ZonePermissions {

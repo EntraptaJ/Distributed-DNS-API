@@ -4,6 +4,7 @@ fragment Zone on Zone {
   domainName
   id
   updatedDate
+  contact
   resourceRecords {
     ...ResourceRecord
   }
