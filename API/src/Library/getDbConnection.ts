@@ -10,7 +10,7 @@ export function getConnectionArgs(
 ): PostgresConnectionOptions {
   return {
     type: 'postgres',
-    database: test ? 'application' : config.db.name,
+    database: test ? 'application-test' : config.db.name,
     username: config.db.username,
     password: config.db.password,
     port: parseInt(`${config.db.port}`, 10),

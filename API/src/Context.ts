@@ -23,7 +23,7 @@ export async function getContext(ctx: KoaContext): Promise<Context> {
 
 let testCurrentUser: User | undefined;
 
-export async function getTestContext(currentUserId?: number): Promise<Context> {
+export async function getTestContext(currentUserId?: string): Promise<Context> {
   if (currentUserId) {
     testCurrentUser = await User.findOne({ where: { id: currentUserId } });
   }
