@@ -16,6 +16,7 @@ import { AuthContext } from 'API/Context';
 import { ResourceRecord } from '../ResourceRecords/ResourceRecordModel';
 import { UserRole } from '../Users/UserRole';
 import { ResourceRecordType } from '../ResourceRecords/ResourceRecordTypes';
+import { ResourceRecordFilter } from './ResourceRecordFilter';
 
 @Resolver(() => Zone)
 export class ZoneResolver {
@@ -65,7 +66,10 @@ export class ZoneResolver {
   }
 
   @FieldResolver(() => [ResourceRecord])
-  async resourceRecords(@Root() { id }: Zone): Promise<ResourceRecord[]> {
-    return ResourceRecord.find({ zoneId: id });
+  async resourceRecords(
+    @Root() { id }: Zone,
+    @Arg('filter', { nullable: true }) filter: ResourceRecordFilter,
+  ): Promise<ResourceRecord[]> {
+    return ResourceRecord.find({ where: { zoneId: id, ...filter } });
   }
 }

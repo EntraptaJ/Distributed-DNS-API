@@ -5,15 +5,23 @@ import { ResourceRecord } from './ResourceRecordModel';
 import { Zone } from '../Zones/ZoneModel';
 import { AuthContext } from 'API/Context';
 import { ZoneAccessPermission } from '../Zones/ZonePermissionModel';
+import { ResourceRecordType } from './ResourceRecordTypes';
 
 @Resolver(() => ResourceRecord)
 export class ResourceRecordResolver {
   @Authorized()
-  @Mutation(() => Boolean)
+  @Mutation(() => Zone)
   async createValueResourceRecord(
-    @Arg('input') { zoneId, value, ...type }: CreateValueResourceRecordInput,
+    @Arg('input')
+    {
+      zoneId,
+      value,
+      recordType,
+      ttl,
+      ...input
+    }: CreateValueResourceRecordInput,
     @Ctx() { currentUser }: AuthContext,
-  ): Promise<boolean> {
+  ): Promise<Zone> {
     const zone = await Zone.getUserZone(
       currentUser,
       zoneId,
@@ -22,10 +30,11 @@ export class ResourceRecordResolver {
     );
     await ResourceRecord.create({
       zoneId: zone.id,
-      data: JSON.stringify({ value }),
-      ...type,
+      data: JSON.stringify({ value, ttl }),
+      type: ResourceRecordType[recordType],
+      ...input,
     }).save();
 
-    return true;
+    return zone;
   }
 }

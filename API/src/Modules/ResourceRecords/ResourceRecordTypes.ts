@@ -1,9 +1,14 @@
 // API/src/Modules/ResourceRecords/ResourceRecordTypes.ts
-import { registerEnumType } from 'type-graphql'
+import { registerEnumType } from 'type-graphql';
 
 export enum ResourceRecordType {
   A = 'A',
-  NS = 'NS'
+  NS = 'NS',
+  TXT = 'TXT',
+  CNAME = 'CNAME',
+  DNAME = 'DNAME',
+  AAAA = 'AAAA',
+  MX = 'MX',
 }
 
-registerEnumType(ResourceRecordType, { name: 'ResourceRecordType' })
+registerEnumType(ResourceRecordType, { name: 'ResourceRecordType' });

@@ -12,6 +12,14 @@ type Configuration {
   id: ID!
 }
 
+input CreateMXResourceRecordInput {
+  zoneId: String!
+  host: String!
+  ttl: Int
+  preference: Int!
+  value: String!
+}
+
 input CreateSubscriberInput {
   zoneIds: [String!]!
 }
@@ -22,7 +30,8 @@ input CreateUtilityInput {
 
 input CreateValueResourceRecordInput {
   zoneId: String!
-  type: ResourceRecordType!
+  recordType: ValueRecordType!
+  ttl: Int
   host: String!
   value: String!
 }
@@ -53,7 +62,7 @@ type Mutation {
   register(input: RegisterInput!): RegisterResponse!
   resetPasswordReset(input: RequestPasswordResetInput!): Boolean!
   initialConfiguration(input: InitialConfigurationInput!): Configuration!
-  createValueResourceRecord(input: CreateValueResourceRecordInput!): Boolean!
+  createValueResourceRecord(input: CreateValueResourceRecordInput!): Zone!
   createSubscriber(input: CreateSubscriberInput!): Subscriber!
   addZoneToSubscription(subscriberId: String!, zoneId: String!): Subscriber!
   createUtility(input: CreateUtilityInput!): Utility!
@@ -101,9 +110,19 @@ type ResourceRecord {
   data: String!
 }
 
+input ResourceRecordFilter {
+  host: String
+  type: ResourceRecordType
+}
+
 enum ResourceRecordType {
   A
   NS
+  TXT
+  CNAME
+  DNAME
+  AAAA
+  MX
 }
 
 type Subscriber {
@@ -138,12 +157,21 @@ type Utility {
   name: String!
 }
 
+enum ValueRecordType {
+  A
+  NS
+  CNAME
+  DNAME
+  AAAA
+  TXT
+}
+
 type Zone {
   id: ID!
   contact: String!
   updatedDate: DateTime!
   domainName: String!
-  resourceRecords: [ResourceRecord!]!
+  resourceRecords(filter: ResourceRecordFilter): [ResourceRecord!]!
   accessPermissions: [ZonePermissions!]!
   subscribers: [Subscriber!]!
 }
