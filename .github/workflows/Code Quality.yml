@@ -1,0 +1,32 @@
+name: Code Quality
+on:
+  push:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - master
+  pull_request:
+jobs:
+  Testing:
+    name: Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pgpass
+          POSTGRES_HOST: localhost
+          POSTGRES_DB: application
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v1
+      - name: Test API
+        uses: KristianFJones/npm-run-action@alternative
+        env:
+          DB_HOST: postgres
+        with:
+          scriptName: 'test'
+          scriptPath: 'api/'
