@@ -29,4 +29,4 @@ jobs:
           DB_HOST: postgres
         with:
           scriptName: 'test'
-          scriptPath: 'api/'
+          scriptPath: 'API/'
