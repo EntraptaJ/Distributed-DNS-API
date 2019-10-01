@@ -4,7 +4,7 @@ import { TypeormBlueprint } from '@entity-factory/typeorm';
 import { ZonePermissions } from './ZonePermissionModel';
 import { Zone } from './ZoneModel';
 
-export class UserFactory extends TypeormBlueprint<ZonePermissions> {
+export class ZonePermissionFactory extends TypeormBlueprint<ZonePermissions> {
   constructor() {
     super();
 

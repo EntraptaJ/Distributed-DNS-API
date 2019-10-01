@@ -3,7 +3,7 @@ import { DeepEntityPartial } from '@entity-factory/core';
 import { TypeormBlueprint } from '@entity-factory/typeorm';
 import { Configuration } from './ConfigurationModel';
 
-export class UserFactory extends TypeormBlueprint<Configuration> {
+export class ConfigurationFactory extends TypeormBlueprint<Configuration> {
   constructor() {
     super();
 
