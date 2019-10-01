@@ -48,6 +48,25 @@ export class SubscribersResolver {
     return subscriber;
   }
 
+  @Authorized()
+  @Mutation(() => Subscriber)
+  async addZoneToSubscription(
+    @Arg('zoneId') zoneId: string,
+    @Arg('subscriberId') subscriberId: string,
+    @Ctx() { currentUser }: AuthContext,
+  ): Promise<Subscriber> {
+    const [zone, subscriber] = await Promise.all([
+      Zone.getUserZone(currentUser, zoneId, ZoneAccessPermission.ADMIN),
+      Subscriber.findOneOrFail({ id: subscriberId }),
+    ]);
+
+    subscriber.subscribedZones.push(zone);
+    await subscriber.save();
+    await subscriberPubSub.addZoneToSubscriber(subscriber.id, zone.id);
+
+    return subscriber.save();
+  }
+
   @Subscription({
     // @ts-ignore
     subscribe: async (stuff, args) =>

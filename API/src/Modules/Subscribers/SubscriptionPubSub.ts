@@ -4,28 +4,63 @@ import { Subscriber } from './SubscriberModel';
 import pEvent from 'p-event';
 import { Zone } from '../Zones/ZoneModel';
 
-export class SubscriberPubSub {
-  public ee = new EventEmitter();
+interface EventSubscriber {
+  Id: string;
+  eventEmitter: EventEmitter;
+}
 
+const eventSubscribers: EventSubscriber[] = [];
+
+const timeout = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+export class SubscriberPubSub {
+  public ee: EventEmitter = new EventEmitter();
   public async publish(zoneId: string, payload: Zone) {
-    console.log(zoneId, payload);
     this.ee.emit(zoneId, payload);
+  }
+
+  public async addZoneToSubscriber(
+    subscriberId: string,
+    zoneId: string,
+  ): Promise<void> {
+    const zone = await Zone.findOneOrFail({
+      where: { id: zoneId },
+      relations: ['resourceRecords'],
+    });
+
+    this.ee.emit(`${subscriberId}-newZone`);
+
+    await timeout(10000);
+
+    this.ee.emit(zone.id, zone);
   }
 
   public async subscribe(
     subscriberToken: string,
   ): Promise<AsyncIterator<Zone>> {
-    const subscription = await Subscriber.getSubscriberFromToken(
-      subscriberToken,
-    );
+    const eventEmitter = this.ee;
+    let subscription = await Subscriber.getSubscriberFromToken(subscriberToken);
+    eventSubscribers.push({ Id: subscription.id, eventEmitter });
 
-    const zoneIds: string[] = [];
+    async function* zoneEvents() {
+      subscription = await Subscriber.getSubscriberFromToken(subscriberToken);
+      const zoneIds: string[] = [];
 
-    for (const { id } of subscription.subscribedZones) zoneIds.push(id);
+      for (const { id } of subscription.subscribedZones) zoneIds.push(id);
 
-    return pEvent.iterator(this.ee, zoneIds, {
-      resolutionEvents: ['end'],
-    });
+      yield* pEvent.iterator(eventEmitter, zoneIds, {
+        resolutionEvents: [`${subscription.id}-newZone`],
+      });
+    }
+
+    async function* subscribeToZoneGen() {
+      while (true) {
+        yield* zoneEvents();
+      }
+    }
+
+    return subscribeToZoneGen();
   }
   public async unsubscribe(subId: number) {}
 }

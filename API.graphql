@@ -55,6 +55,7 @@ type Mutation {
   initialConfiguration(input: InitialConfigurationInput!): Configuration!
   createValueResourceRecord(input: CreateValueResourceRecordInput!): Boolean!
   createSubscriber(input: CreateSubscriberInput!): Subscriber!
+  addZoneToSubscription(subscriberId: String!, zoneId: String!): Subscriber!
   createUtility(input: CreateUtilityInput!): Utility!
   createZone(input: ZoneInput!): Zone!
 }
