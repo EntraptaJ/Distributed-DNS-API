@@ -17,12 +17,13 @@ import {
 import { User } from 'API/Modules/Users/UserModel';
 import { hasSetup } from '../Utilities/hasSetup';
 import { AuthContext } from 'API/Context';
+import { CurrentUser } from './CurrentUser';
 
 @Resolver()
 export class AuthResolver {
   @Authorized()
-  @Query(() => User)
-  async currentUser(@Ctx() { currentUser }: AuthContext): Promise<User> {
+  @Query(() => CurrentUser)
+  async currentUser(@Ctx() { currentUser }: AuthContext): Promise<CurrentUser> {
     return currentUser;
   }
 

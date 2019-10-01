@@ -20,7 +20,6 @@ export function getConnectionArgs(
       resolve(`${__dirname}/../Modules/**/*Model.js`),
     ],
     synchronize: true || config.env === 'development',
-    logging: true,
   };
 }
 

@@ -42,6 +42,6 @@ describe('Authentication Resolver', () => {
     expect(data.register.token).toBeDefined();
     expect(errors).toBeUndefined();
 
-    configuration.remove();
+    await configuration.remove();
   });
 });

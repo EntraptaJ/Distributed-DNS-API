@@ -70,10 +70,11 @@ type Mutation {
 }
 
 type Query {
-  currentUser: User!
+  currentUser: CurrentUser!
   hasSetup: Boolean!
   getSubscribedZones(subscriberToken: String!): [Zone!]!
   users: [User!]!
+  user(userId: String!): User!
   utilities: [Utility!]!
   helloWorld: String!
   zones: [Zone!]!
@@ -169,7 +170,7 @@ enum ValueRecordType {
 type Zone {
   id: ID!
   contact: String!
-  updatedDate: DateTime!
+  updatedDate: DateTime
   domainName: String!
   resourceRecords(filter: ResourceRecordFilter): [ResourceRecord!]!
   accessPermissions: [ZonePermissions!]!

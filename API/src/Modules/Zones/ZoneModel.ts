@@ -32,16 +32,14 @@ export class Zone extends BaseEntity {
   @Column('varchar')
   contact: string;
 
-  @Field(() => Date)
-  async updatedDate(): Promise<Date> {
+  @Field(() => Date, { nullable: true })
+  async updatedDate(): Promise<Date | undefined> {
     const resourceRecord = await ResourceRecord.getRepository().findOne(
       undefined,
       { order: { updatedAt: 'DESC' } },
     );
-    console.log(resourceRecord);
 
-    // @ts-ignore
-    return resourceRecord.updatedAt;
+    return resourceRecord ? resourceRecord.updatedAt : undefined;
   }
 
   @Field()
