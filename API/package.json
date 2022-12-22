@@ -62,7 +62,7 @@
     "apollo-server-koa": "^2.9.4",
     "bcryptjs": "^2.4.3",
     "class-validator": "^0.10.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "koa": "^2.8.1",
     "module-alias": "^2.2.1",
     "p-event": "^4.1.0",
