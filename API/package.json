@@ -61,7 +61,7 @@
     "@types/graphql": "^14.5.0",
     "apollo-server-koa": "^2.9.4",
     "bcryptjs": "^2.4.3",
-    "class-validator": "^0.10.1",
+    "class-validator": "^0.14.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.8.1",
     "module-alias": "^2.2.1",
